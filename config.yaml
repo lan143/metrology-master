@@ -1,0 +1,30 @@
+log:
+  level: debug
+
+mqtt:
+  host: "127.0.0.1"
+  port: 1883
+
+home-assistant:
+  auto-discovery: true
+  prefix: homeassistant
+
+serial:
+  - include:
+      - rs485
+  - rs485:
+      port: "/dev/ttyUSB0"
+      baud-rate: 9600
+      data-bits: 8
+      stop-bits: 1
+      parity: 0
+
+meters:
+  - include:
+      - electricity
+  - electricity:
+      type: pulsar_1t
+      uid: 0x08833976
+      port: rs485
+      export:
+        - mqtt
