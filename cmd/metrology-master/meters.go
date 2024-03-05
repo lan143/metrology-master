@@ -1,11 +1,12 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/lan143/metrology-master/internal/job"
 	"github.com/lan143/metrology-master/internal/meter"
-	pulsar_t1 "github.com/lan143/metrology-master/internal/meter/pulsar-t1"
-	pulsar_m "github.com/lan143/metrology-master/internal/protocol/pulsar-m"
+	pulsar_t1 "github.com/lan143/metrology-master/internal/meter/pulsar-electro"
+	pulsar_m "github.com/lan143/metrology-master/internal/protocol/pulsar"
 )
 
 type Meters struct {
@@ -23,16 +24,22 @@ func (c *Command) InitMeters(configs map[string]*meter.Config) error {
 				return fmt.Errorf("port \"%s\" not found in ports list", config.Port)
 			}
 
-			protocol := pulsar_m.NewPulsarM(port, c.log)
+			protocol := pulsar_m.NewPulsar(port, c.log)
 
 			address, err := pulsar_m.ParseAddress(config.UID)
 			if err != nil {
 				return fmt.Errorf("parse address \"%s\": %s", config.UID, err.Error())
 			}
-			m := pulsar_t1.NewPulsarT1(
+			m := pulsar_t1.NewPulsarElectro(
 				pulsar_t1.Config{Address: address},
 				protocol,
+				c.log,
 			)
+			err = m.Init(context.Background())
+			if err != nil {
+				return err
+			}
+
 			c.meters.electricMeters[name] = m
 			c.scheduler.AddJob(
 				job.NewUpdateMeterJob(

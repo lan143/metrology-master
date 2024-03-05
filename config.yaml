@@ -23,7 +23,7 @@ meters:
   - include:
       - electricity
   - electricity:
-      type: pulsar_1t
+      type: pulsar_electro
       uid: 0x08833976
       port: rs485
       export:

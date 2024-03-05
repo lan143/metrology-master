@@ -1,4 +1,4 @@
-package pulsar_m
+package pulsar
 
 import (
 	"strconv"

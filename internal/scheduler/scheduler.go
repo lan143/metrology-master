@@ -48,14 +48,15 @@ func (s *Scheduler) executeJob(job job.Job, shutdownCh chan struct{}) {
 	defer cancel()
 
 	for {
+		err := job.Execute(ctx)
+		if err != nil {
+			s.log.Error("execute job", zap.Error(err))
+		}
+
 		select {
 		case <-shutdownCh:
 			return
 		case <-ticker.C:
-			err := job.Execute(ctx)
-			if err != nil {
-				s.log.Error("execute job", zap.Error(err))
-			}
 		}
 	}
 }
